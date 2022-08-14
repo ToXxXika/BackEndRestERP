@@ -41,7 +41,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         System.out.println("********** configure httpSecurity **********");
         http.csrf().disable();
         http.cors().and()
-                .authorizeRequests()
+                .authorizeRequests().antMatchers("/operation").permitAll()
                 .anyRequest()
                 .permitAll()
                 .and()
@@ -54,7 +54,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
-    //cryptage password using Bcrypt
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

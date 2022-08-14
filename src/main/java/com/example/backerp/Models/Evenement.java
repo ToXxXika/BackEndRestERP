@@ -1,6 +1,7 @@
 package com.example.backerp.Models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -57,6 +58,7 @@ public class Evenement {
     }
 
     @OneToMany(mappedBy = "evenementByIdeventfk")
+
     public Collection<Logparticipation> getLogparticipationsByIdevent() {
         return logparticipationsByIdevent;
     }

@@ -16,6 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 @CrossOrigin("*")
@@ -104,8 +106,6 @@ public class OperationController {
         }
         return Res;
     }
-
-
     @GetMapping("/getAssociations")
     public void excelReader2(@RequestParam("file") MultipartFile excel) throws IOException {
         int i = 1;
@@ -229,8 +229,9 @@ public class OperationController {
 
 
     }
+    //
 
-    @GetMapping("/loadusers")
+    @PostMapping("/uploadfile")
     public void exceluserReader(@RequestParam("file") MultipartFile excel) throws IOException {
 
         // read a csv file and add it into the database
@@ -293,12 +294,34 @@ public class OperationController {
     }
 
     @PostMapping("/addEvent")
-    public boolean addEvent(@RequestBody Evenement evenement,@RequestBody Detailevenement detailEvenement){
-        return queryResolver.AddEvent(evenement,detailEvenement);
+    public boolean addEvent(@RequestBody Evenement evenement){
+        return queryResolver.AddEvent(evenement);
     }
     @PostMapping("/addUser")
     public boolean addUser(@RequestBody Utilisateur utilisateur){
         return queryResolver.AddUser(utilisateur);
+    }
+
+    @GetMapping("/login")
+    public Principal login(Principal p){
+        return queryResolver.login(p);
+    }
+    @GetMapping("/deleteUserByCin")
+    public boolean deleteUserByCin(@RequestParam(name = "cin") String cin){
+        return queryResolver.DeleteUser(cin);
+    }
+
+    @PostMapping("/addDetailEvent")
+    public boolean addDetailEvent(@RequestBody Detailevenement detailEvenement){
+        return queryResolver.addDetailEveent(detailEvenement);
+    }
+    @PostMapping("/participate")
+    public boolean participate(@RequestBody Logparticipation lp,@RequestParam(name = "places") int places){
+        return queryResolver.participate(lp,places);
+    }
+    @PostMapping("/savelog")
+    public boolean savelog(@RequestBody Logparticipation lp){
+        return queryResolver.saveLog(lp);
     }
 
 }

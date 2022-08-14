@@ -8,7 +8,9 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -71,14 +73,12 @@ public class QueryResolver  {
                 return false;
          }
         }
-        public boolean AddEvent(Evenement event, Detailevenement DE){
+        public boolean AddEvent(Evenement event){
           boolean Res = false ;
             try{
-                if(DER.save(DE) != null){
-                    event.setDetails(DE.getIdetail());
                     ER.save(event);
                     Res=  true;
-                }
+
 
             } catch (Exception e){
               System.out.println(e.getMessage());
@@ -106,39 +106,76 @@ public class QueryResolver  {
         }
         return Res ;
     }
-    public Boolean participate(Logparticipation LP,Integer NbrPlaces){
+    public boolean addDetailEveent(Detailevenement DE) {
+        boolean Res = false;
+        try {
+            DER.save(DE);
+            Res = true;
+        } catch (Exception GEE) {
+            System.out.println(GEE.getMessage());
+        }
+        return Res;
+    }
+      //TODO: payement method
+
+    public boolean saveLog(Logparticipation L){
         boolean Res = false ;
+        try {
+            //display L
+            System.out.println("Utilisateur" + L.getIdutilisateur());
+            System.out.println("Evenement" + L.getIdeventfk());
+            System.out.println("Montant"+L.getMontantpaye());
+            LPR.save(L);
+            Res=  true;
+        }catch (Exception GEE){
+            System.out.println(GEE.getMessage());
+        }
+        return Res ;
+    }
+    public Boolean participate(Logparticipation LP,Integer NbrPlaces) {
+
+        boolean Res = false;
         Optional<Evenement> evenement = ER.findById(LP.getIdeventfk());
-        if(evenement.isPresent()){
-            Optional<Detailevenement> detailevenement = DER.findById(evenement.get().getDetails());
-            if(detailevenement.isPresent()){
-                if(detailevenement.get().getPlaces()>NbrPlaces){
-                    try {
-                        LPR.save(LP);
-                        int montant= LP.getMontantpayé();
-                        int idevent = LP.getIdeventfk();
-                        Iterable<Paie> P = PR.findByRefconv(idevent);
-                        if(P.iterator().hasNext()){
-                            Paie paie = P.iterator().next();
-                            paie.setMontanttotal(paie.getMontanttotal()+montant);
-                            paie.setMontantpayeparagile(paie.getMontantpayeparagile()+((detailevenement.get().getPrix()) * (detailevenement.get().getPromotion()))/100);
-                            if(updateplaces(detailevenement.get(),NbrPlaces)){
-                                PR.save(paie);
-                                Res=  true;
-                            }
-                        }else{
-                            Paie paie = new Paie();
-                            paie.setMontanttotal(montant);
-                            paie.setRefconv(P.iterator().next().getRefconv());
-                            paie.setMontantpayeparagile((detailevenement.get().getPrix()*detailevenement.get().getPromotion())/100);
-                            PR.save(paie);
-                            Res=  true;
-                        }
-                    }catch (GraphqlErrorException GEE){
-                        System.out.println(GEE.getMessage());
-                    }
+        try {
+            LPR.save(LP);
+            Iterable<Paie> P = PR.findByRefconv(LP.getIdeventfk());
+            if (!P.iterator().hasNext()) {
+                Paie p = new Paie();
+                p.setRefconv(evenement.get().getRefconv());
+                p.setMontanttotal(LP.getMontantpaye());
+                p.setMontantpayeparagile((evenement.get().getDetailevenementByDetails().getPrix() * evenement.get().getDetailevenementByDetails().getPromotion()) / 100);
+                if (updateplaces(evenement.get().getDetailevenementByDetails(), NbrPlaces)) {
+                    PR.save(p);
+                    Res = true;
+                }
+            } else {
+                Paie p = new Paie();
+                p.setMontanttotal(p.getMontanttotal() + LP.getMontantpaye());
+                p.setMontantpayeparagile(p.getMontantpayeparagile() + ((evenement.get().getDetailevenementByDetails().getPrix()) * (evenement.get().getDetailevenementByDetails().getPrix())) / 100);
+                p.setRefconv(evenement.get().getRefconv());
+                if (updateplaces(evenement.get().getDetailevenementByDetails(), NbrPlaces)) {
+                    PR.save(p);
+                    Res = true;
                 }
             }
+        } catch (Exception E) {
+            System.out.println(E.getMessage());
+        }
+        return Res;
+
+    }
+
+    public Principal login(Principal principal){
+        return principal ;
+    }
+    public boolean DeleteUser(String cin){
+        boolean Res = false ;
+        try {
+            if(UR.deleteUtilisateurByCin(cin).isPresent()){
+                Res= true ;
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
         }
         return Res ;
     }

@@ -1,8 +1,13 @@
 package com.example.backerp.Models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import lombok.extern.java.Log;
 import org.hibernate.Hibernate;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.Collection;
@@ -16,7 +21,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Utilisateur {
+public class Utilisateur implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id")
@@ -36,8 +41,8 @@ public class Utilisateur {
     @Basic
     @Column(name = "password")
     private String password;
-    @OneToMany(mappedBy = "utilisateurByIdutilisateur",targetEntity = Logparticipation.class,fetch =FetchType.EAGER)
-
+    @OneToMany(mappedBy = "utilisateurByIdutilisateur")
+    @JsonIgnore
     private Collection<Logparticipation> logparticipationsById;
 
     @Override
@@ -59,5 +64,46 @@ public class Utilisateur {
 
     public void setLogparticipationsById(Collection<Logparticipation> logparticipationsById) {
         this.logparticipationsById = logparticipationsById;
+    }
+
+    @Transient
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+
+    @Transient
+    @Override
+    public String getUsername() {
+        return mail;
+    }
+
+    @Transient
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Transient
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Transient
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Transient
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+    @Transient
+    @Override
+    public String getPassword() {
+        return password;
     }
 }
