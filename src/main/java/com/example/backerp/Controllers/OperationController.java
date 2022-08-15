@@ -106,7 +106,7 @@ public class OperationController {
         }
         return Res;
     }
-    @GetMapping("/getAssociations")
+    @PostMapping("/loadEventFile")
     public void excelReader2(@RequestParam("file") MultipartFile excel) throws IOException {
         int i = 1;
         XSSFWorkbook workbook = new XSSFWorkbook(excel.getInputStream());

@@ -121,10 +121,6 @@ public class QueryResolver  {
     public boolean saveLog(Logparticipation L){
         boolean Res = false ;
         try {
-            //display L
-            System.out.println("Utilisateur" + L.getIdutilisateur());
-            System.out.println("Evenement" + L.getIdeventfk());
-            System.out.println("Montant"+L.getMontantpaye());
             LPR.save(L);
             Res=  true;
         }catch (Exception GEE){
