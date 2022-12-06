@@ -1,3 +1,6 @@
 FROM openjdk:18.0.2
-COPY  target/*.jar  app.jar
-ENTRYPOINT [ "java" , "-jar" , "app.jar" ]
+WORKDIR /BackEndRestERP
+COPY . .
+
+RUN mvn clean install
+CMD spring-boot:run
